@@ -1,0 +1,13 @@
+__pycache__/
+build/
+*.egg-info/
+out/
+temp/
+log/
+temp*/
+temp*.*
+*.log
+*.npz
+*.so
+*.tar*
+*.vsix
