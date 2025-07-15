@@ -4,12 +4,11 @@
 
 MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second
 
-[Chenguo Lin<sup>1*</sup>](https://chenguolin.github.io), [Yuchen Lin<sup>1,3*</sup>](https://wgsxm.github.io), [Panwang Pan<sup>2†</sup>](https://paulpanwang.github.io)
-[Yifan Yu<sup>2</sup>](https://scholar.google.com/citations?user=S2OksN4AAAAJ), [Honglei Yan<sup>2</sup>](https://openreview.net/profile?id=~Honglei_Yan1), [Katerina Fragkiadaki<sup>3</sup>](https://www.cs.cmu.edu/~katef/), [Yadong Mu<sup>1</sup>](http://www.muyadong.com)
+[Chenguo Lin<sup>1*</sup>](https://chenguolin.github.io), [Yuchen Lin<sup>1,3*</sup>](https://wgsxm.github.io), [Panwang Pan<sup>2†</sup>](https://paulpanwang.github.io),<br>[Yifan Yu<sup>2</sup>](https://scholar.google.com/citations?user=S2OksN4AAAAJ), [Honglei Yan<sup>2</sup>](https://openreview.net/profile?id=~Honglei_Yan1), [Katerina Fragkiadaki<sup>3</sup>](https://www.cs.cmu.edu/~katef/), [Yadong Mu<sup>1</sup>](http://www.muyadong.com)
 
 <sup>1</sup>Peking University, <sup>2</sup>ByteDance, <sup>3</sup>Carnegie Mellon University
 
-[![arXiv](https://img.shields.io/badge/arXiv-2507.-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2507.)
+[![arXiv](https://img.shields.io/badge/arXiv-2507.10065-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2507.10065)
 [![Project Page](https://img.shields.io/badge/🏠-Project%20Page-blue.svg)](https://chenguolin.github.io/projects/MoVieS)
 
 <p>
@@ -18,7 +17,7 @@ MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second
 
 </h4>
 
-This repository contains the official implementation of the paper: [MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second](https://arxiv.org/abs/2507.).
+This repository contains the official implementation of the paper: [MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second](https://arxiv.org/abs/2507.10065).
 MoVieS is a feed-forward framework that jointly reconstructs appearance, geometry and motion for 4D scene perception from monocular videos in one second.
 
 Feel free to contact me (chenguolin@stu.pku.edu.cn) or open an issue if you have any questions or suggestions.
@@ -72,7 +71,7 @@ If you find our work helpful, please consider citing:
 @article{lin2025movies,
   title={MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second},
   author={Lin, Chenguo and Lin, Yuchen and Pan, Panwang and Yu, Yifan and Yan, Honglei and Fragkiadaki, Katerina and Mu, Yadong},
-  journal={arXiv preprint arXiv:2507.},
+  journal={arXiv preprint arXiv:2507.10065},
   year={2025}
 }
 ```
