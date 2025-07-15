@@ -1,8 +1,10 @@
 # 🎞️MoVieS
 
-<h4 align="center">
+<p align="center">
+  <font size="+3"><strong>MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second</strong></font>
+</p>
 
-MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second
+<h4 align="center">
 
 [Chenguo Lin<sup>1*</sup>](https://chenguolin.github.io), [Yuchen Lin<sup>1,3*</sup>](https://wgsxm.github.io), [Panwang Pan<sup>2†</sup>](https://paulpanwang.github.io),<br>[Yifan Yu<sup>2</sup>](https://scholar.google.com/citations?user=S2OksN4AAAAJ), [Honglei Yan<sup>2</sup>](https://openreview.net/profile?id=~Honglei_Yan1), [Katerina Fragkiadaki<sup>3</sup>](https://www.cs.cmu.edu/~katef/), [Yadong Mu<sup>1</sup>](http://www.muyadong.com)
 
@@ -52,8 +54,8 @@ bash settings/setup.sh
 
 ![datasets](./assets/datasets.png)
 
-- We use three static scene datasets ([RealEstate10K](), [TartanAir]() and [MatrixCity]()) and five dynamic scene datasets ([PointOdyssey](), [DynamicReplica](), [Spring](), [VKITTI2]() and [Stereo4D]()) to train MoVieS.
-- We will provide pre-processing scripts to these datasets soon. Please stay tuned or open an issue to push me to hurry up😃.
+- We use three static scene datasets ([RealEstate10K](https://google.github.io/realestate10k), [TartanAir](https://theairlab.org/tartanair-dataset) and [MatrixCity](https://city-super.github.io/matrixcity)) and five dynamic scene datasets ([PointOdyssey](https://pointodyssey.com), [DynamicReplica](https://dynamic-stereo.github.io), [Spring](https://spring-benchmark.org), [VKITTI2](https://europe.naverlabs.com/proxy-virtual-worlds-vkitti-2) and [Stereo4D](https://stereo4d.github.io)) to train MoVieS.
+- We will provide pre-processing scripts to these datasets soon. Please stay tuned or open an issue to push me to hurry up 😃.
 
 
 ## 🚀 Usage
