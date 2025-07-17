@@ -13,7 +13,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2507.10065-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2507.10065)
 [![Project Page](https://img.shields.io/badge/🏠-Project%20Page-blue.svg)](https://chenguolin.github.io/projects/MoVieS)
 [![Video](https://img.shields.io/badge/YouTube-Video-red.svg?logo=youtube)](https://www.youtube.com/watch?v=pNfmIchMji8)
-
+[![HF_Paper](https://img.shields.io/badge/🤗-Daily%20Papers-ffbd00.svg)](https://huggingface.co/papers/2507.10065)
 <p>
     <img width="730", src="./assets/teaser.gif">
 </p>
