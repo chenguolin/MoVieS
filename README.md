@@ -1,8 +1,8 @@
 # 🎞️MoVieS
 
-<p align="center">
-  <font size="+3"><strong>MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second</strong></font>
-</p>
+<p align="center"> 
+  <a href="https://chenguolin.github.io/projects/MoVieS" style="text-decoration: none"><font size="+4"><strong>MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second</strong></font></a> 
+ </p> 
 
 <h4 align="center">
 
