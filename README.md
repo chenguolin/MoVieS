@@ -101,7 +101,7 @@ We would like to thank the authors of [DiffSplat](https://github.com/chenguolin/
 ## 📚 Citation
 If you find our work helpful, please consider citing:
 ```bibtex
-@inproceedings{wang2025vggt,
+@inproceedings{lin2026movies,
   title={MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second},
   author={Lin, Chenguo and Lin, Yuchen and Pan, Panwang and Yu, Yifan and and Hu, Tao and Yan, Honglei and Fragkiadaki, Katerina and Mu, Yadong},
   booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR)},
