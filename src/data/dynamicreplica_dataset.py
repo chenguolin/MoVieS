@@ -123,9 +123,10 @@ class DynamicreplicaDataset(BaseDataset):
         images, depths, depth_masks, C2W, fxfycxcy, tracks_world, tracks_xy, visibilities = \
             self._data_augment(images, depths, depth_masks, C2W, fxfycxcy, tracks_world, tracks_xy, visibilities)
             ## (Optional) Mask by quantile after downsampling for efficiency
-        if self.depth_quantile is not None:
-            depth_masks = depth_masks & (depths > np.quantile(depths.numpy(), self.depth_quantile))
-            depth_masks = depth_masks & (depths < np.quantile(depths.numpy(), 1.-self.depth_quantile))
+        if self.min_depth_quantile is not None:
+            depth_masks = depth_masks & (depths > np.quantile(depths.numpy(), self.min_depth_quantile))
+        if self.max_depth_quantile is not None:
+            depth_masks = depth_masks & (depths < np.quantile(depths.numpy(), self.max_depth_quantile))
 
         # Camera normalization
             ## 1. Transform 3D tracks if needed
@@ -154,6 +155,6 @@ class DynamicreplicaDataset(BaseDataset):
             "track_world": tracks_world,               # Tensor: (F, N, 3)
             "track_xy": tracks_xy.long(),              # LongTensor: (F, N, 2)
             "visibility": visibilities.bool(),         # BoolTensor: (F, N)
-            "depth_weight": torch.tensor(0.8),         # Tensor: (1,); noisy depth
-            "motion_weight": torch.tensor(1.),         # Tensor: (1,)
+            "depth_weight": torch.tensor(0.5),         # Tensor: (1,); noisy depth
+            "motion_weight": torch.tensor(0.5),        # Tensor: (1,); noisy depth
         }

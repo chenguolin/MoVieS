@@ -1,4 +1,6 @@
 __pycache__/
+.vscode/
+resources/
 build/
 *.egg-info/
 out/

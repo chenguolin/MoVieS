@@ -2,13 +2,14 @@ from typing import *
 from argparse import Namespace
 from omegaconf import DictConfig
 from multiprocessing import RLock
-from torch import Tensor, LongTensor
+from torch import LongTensor
 from torch.nn import Module
 from accelerate import Accelerator
 from src.options import Options
 
 import os
 from omegaconf import OmegaConf
+from multiprocessing import Process
 import torch
 from torch.multiprocessing import Manager
 from accelerate import load_checkpoint_and_dispatch
@@ -42,7 +43,7 @@ def load_ckpt(
     # Find the latest checkpoint
     if ckpt_iter < 0:
         if hdfs_dir is not None:
-            ckpt_iter = int(sorted(get_hdfs_files(hdfs_dir))[-1].split(".")[0])
+            ckpt_iter = int(sorted(get_hdfs_files(hdfs_dir))[-1].split(".")[0].split("_")[0])
         else:
             ckpt_iter = int(sorted(os.listdir(ckpt_dir))[-1])
 
@@ -53,15 +54,15 @@ def load_ckpt(
         if accelerator is not None:
             if accelerator.is_local_main_process:
                 ensure_sysrun(f"mkdir -p {ckpt_dir}")
-                ensure_sysrun(f"hdfs dfs -get {hdfs_dir}/{ckpt_iter:06d}.tar {ckpt_dir}")
-                ensure_sysrun(f"tar -xvf {ckpt_dir}/{ckpt_iter:06d}.tar -C {ckpt_dir}")
-                ensure_sysrun(f"rm {ckpt_dir}/{ckpt_iter:06d}.tar")
+                ensure_sysrun(f"hdfs dfs -get {hdfs_dir}/{ckpt_iter:06d}*.tar {ckpt_dir}")
+                ensure_sysrun(f'for f in {ckpt_dir}/{ckpt_iter:06d}*.tar; do tar -xvf "$f" -C {ckpt_dir}; done')
+                ensure_sysrun(f"rm {ckpt_dir}/{ckpt_iter:06d}*.tar")
             accelerator.wait_for_everyone()  # wait before preparing checkpoints by the main process
         else:
             ensure_sysrun(f"mkdir -p {ckpt_dir}")
-            ensure_sysrun(f"hdfs dfs -get {hdfs_dir}/{ckpt_iter:06d}.tar {ckpt_dir}")
-            ensure_sysrun(f"tar -xvf {ckpt_dir}/{ckpt_iter:06d}.tar -C {ckpt_dir}")
-            ensure_sysrun(f"rm {ckpt_dir}/{ckpt_iter:06d}.tar")
+            ensure_sysrun(f"hdfs dfs -get {hdfs_dir}/{ckpt_iter:06d}*.tar {ckpt_dir}")
+            ensure_sysrun(f'for f in {ckpt_dir}/{ckpt_iter:06d}*.tar; do tar -xvf "$f" -C {ckpt_dir}; done')
+            ensure_sysrun(f"rm {ckpt_dir}/{ckpt_iter:06d}*.tar")
 
     if model is None:
         return ckpt_iter
@@ -73,21 +74,27 @@ def load_ckpt(
             load_checkpoint_and_dispatch(model, ckpt_path, strict=strict)
         else:  # from DeepSpeed
             if accelerator is not None:
-                if accelerator.is_main_process:
+                if accelerator.is_local_main_process:
                     ensure_sysrun(f"python3 {ckpt_dir}/zero_to_fp32.py {ckpt_dir} {ckpt_dir} --safe_serialization")
                 accelerator.wait_for_everyone()  # wait before preparing checkpoints by the main process
             else:
                 ensure_sysrun(f"python3 {ckpt_dir}/zero_to_fp32.py {ckpt_dir} {ckpt_dir} --safe_serialization")
             load_checkpoint_and_dispatch(model, ckpt_path, strict=strict)
 
-        return model
+        return model, ckpt_iter
 
 
-def save_ckpt(ckpt_dir: str, ckpt_iter: int, hdfs_dir: Optional[str] = None):
+def save_ckpt(ckpt_dir: str, ckpt_iter: int, hdfs_dir: Optional[str] = None, process_index: int = 0):
     if hdfs_dir is not None:
-        ensure_sysrun(f"tar -cf {ckpt_dir}/{ckpt_iter:06d}.tar -C {ckpt_dir} {ckpt_iter:06d}")
-        ensure_sysrun(f"hdfs dfs -put -f {ckpt_dir}/{ckpt_iter:06d}.tar {hdfs_dir}")
-        ensure_sysrun(f"rm -rf {ckpt_dir}/{ckpt_iter:06d}.tar {ckpt_dir}/{ckpt_iter:06d}")
+        # Save checkpoint asynchronously
+        p = Process(target=_save_ckpt, args=(ckpt_dir, ckpt_iter, hdfs_dir, process_index))
+        p.start()
+
+
+def _save_ckpt(ckpt_dir: str, ckpt_iter: int, hdfs_dir: str, process_index: int = 0):
+    ensure_sysrun(f"tar -cf {ckpt_dir}/{ckpt_iter:06d}_{process_index:03d}.tar -C {ckpt_dir} {ckpt_iter:06d}")
+    ensure_sysrun(f"nastk cp {ckpt_dir}/{ckpt_iter:06d}_{process_index:03d}.tar {hdfs_dir}")
+    ensure_sysrun(f"rm -rf {ckpt_dir}/{ckpt_iter:06d}_{process_index:03d}.tar {ckpt_dir}/{ckpt_iter:06d}")
 
 
 def get_configs(yaml_path: str, cli_configs: List[str]=[], **kwargs) -> DictConfig:

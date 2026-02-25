@@ -88,9 +88,10 @@ class SpringDataset(BaseDataset):
         images, depths, depth_masks, C2W, fxfycxcy, tracks_world, tracks_xy, visibilities = \
             self._data_augment(images, depths, depth_masks, C2W, fxfycxcy, tracks_world, tracks_xy, visibilities)
             ## (Optional) Mask by quantile after downsampling for efficiency
-        if self.depth_quantile is not None:
-            depth_masks = depth_masks & (depths > np.quantile(depths.numpy(), self.depth_quantile))
-            depth_masks = depth_masks & (depths < np.quantile(depths.numpy(), 1.-self.depth_quantile))
+        if self.min_depth_quantile is not None:
+            depth_masks = depth_masks & (depths > np.quantile(depths.numpy(), self.min_depth_quantile))
+        if self.max_depth_quantile is not None:
+            depth_masks = depth_masks & (depths < np.quantile(depths.numpy(), self.max_depth_quantile))
 
         # Camera normalization
             ## 1. Transform 3D tracks if needed

@@ -40,12 +40,13 @@ class MulDataset(EasyDataset):
     def __len__(self):
         return self.multiplicator * len(self.dataset)
 
-    def __getitem__(self, idx):
-        if isinstance(idx, tuple):
-            idx, other, another = idx
-            return self.dataset[idx // self.multiplicator, other, another]
+    def __getitem__(self, inputs: Union[int, Tuple[int, float, int]]):
+        if not isinstance(inputs, tuple):
+            index = inputs
+            return self.dataset[index // self.multiplicator]
         else:
-            return self.dataset[idx // self.multiplicator]
+            index, aspect_ratio, image_num = inputs
+            return self.dataset[index // self.multiplicator, aspect_ratio, image_num]
 
 
 class ResizedDataset(EasyDataset):
@@ -61,7 +62,13 @@ class ResizedDataset(EasyDataset):
     def __len__(self):
         return self.new_size
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, inputs: Union[int, Tuple[int, float, int]]):
+        if not isinstance(inputs, tuple):
+            input_index = True
+            index = inputs
+        else:
+            input_index = False
+            index, aspect_ratio, image_num = inputs
         idxs = np.arange(len(self.dataset), dtype=np.int64)
 
         # Rotary extension until target size is met
@@ -71,7 +78,10 @@ class ResizedDataset(EasyDataset):
         self._idxs_mapping = resized_idxs[: self.new_size]
         assert len(self._idxs_mapping) == self.new_size
 
-        return self.dataset[self._idxs_mapping[idx]]
+        if input_index:
+            return self.dataset[self._idxs_mapping[index]]
+        else:
+            return self.dataset[self._idxs_mapping[index], aspect_ratio, image_num]
 
 
 class CatDataset(EasyDataset):
@@ -86,11 +96,21 @@ class CatDataset(EasyDataset):
     def __len__(self):
         return self._cum_sizes[-1]
 
-    def __getitem__(self, idx: int):
-        assert 0 <= idx < len(self)
+    def __getitem__(self, inputs: Union[int, Tuple[int, float, int]]):
+        if not isinstance(inputs, tuple):
+            input_index = True
+            index = inputs
+        else:
+            input_index = False
+            index, aspect_ratio, image_num = inputs
 
-        db_idx = np.searchsorted(self._cum_sizes, idx, "right")
+        assert 0 <= index < len(self)
+
+        db_idx = np.searchsorted(self._cum_sizes, index, "right")
         dataset = self.datasets[db_idx]
-        new_idx = idx - (self._cum_sizes[db_idx - 1] if db_idx > 0 else 0)
+        new_idx = index - (self._cum_sizes[db_idx - 1] if db_idx > 0 else 0)
 
-        return dataset[new_idx]
+        if input_index:
+            return dataset[new_idx]
+        else:
+            return dataset[new_idx, aspect_ratio, image_num]

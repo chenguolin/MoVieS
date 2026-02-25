@@ -11,6 +11,7 @@ from .stereo4d_dataset import Stereo4dDataset
 from .tartanair_dataset import TartanairDataset
 from .vkitti2_dataset import Vkitti2Dataset
 
+from .dynamic_dataloader import DynamicDataLoader
 
 # Copied from https://github.com/huggingface/pytorch-image-models/blob/main/timm/data/loader.py
 class MultiEpochsDataLoader(DataLoader):

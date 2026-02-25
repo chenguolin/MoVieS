@@ -38,7 +38,7 @@ class BaseDataset(EasyDataset):
 
         # For dataset-specific settings
         self.min_bounded_gap, self.max_bounded_gap, self.test_max_bounded_gap = None, None, None
-        self.depth_quantile, self.is_static = None, None
+        self.min_depth_quantile, self.max_depth_quantile, self.is_static = None, None, None
         self.dataset_args = deepcopy(opt.default_dataset_args)
         if name in opt.dataset_args:
             self.dataset_args.update(opt.dataset_args[name])
@@ -47,10 +47,21 @@ class BaseDataset(EasyDataset):
         if not self.training and self.test_max_bounded_gap is not None:
             self.max_bounded_gap = self.test_max_bounded_gap  # reset to test max bounded gap
 
+        self.aspect_ratio, self.num_input_frames = None, None
+        self.real_min_bounded_gap, self.real_max_bounded_gap = self.min_bounded_gap, self.max_bounded_gap
+
     def __len__(self):
         return len(self.sample_dirs)
 
-    def __getitem__(self, index: int) -> Dict[str, Any]:
+    def __getitem__(self, inputs: Union[int, Tuple[int, float, int]]) -> Dict[str, Any]:
+        if not isinstance(inputs, tuple):
+            index, aspect_ratio, image_num = inputs, self.opt.input_res[0]/self.opt.input_res[1], self.opt.num_input_frames
+        else:
+            index, aspect_ratio, image_num = inputs
+        self.aspect_ratio, self.num_input_frames = aspect_ratio, image_num
+        self.real_min_bounded_gap = self.min_bounded_gap // self.opt.num_input_frames * self.num_input_frames
+        self.real_max_bounded_gap = self.max_bounded_gap // self.opt.num_input_frames * self.num_input_frames
+
         return_dict = self._try_getitem(index)
 
         # 1. Valid points
@@ -70,7 +81,7 @@ class BaseDataset(EasyDataset):
             ## 2. Camera rotates too much
             rotation_diff(R[:, 1:], R[:, :-1]).max() > self.opt.max_rotation_diff
         ):
-            return self.__getitem__(np.random.randint(len(self)))  # re-sample
+            return self.__getitem__((np.random.randint(len(self)), aspect_ratio, image_num))  # re-sample
         else:
             return return_dict
 
@@ -95,12 +106,12 @@ class BaseDataset(EasyDataset):
 
     def _frame_sample(self, num_frames: int, fixed_start_idx: Optional[int] = None) -> Tuple[List[int], List[int]]:
         frame_idxs = np.arange(num_frames, dtype=int)
-        F_all, F_in, F_out = len(frame_idxs), self.opt.num_input_frames, self.opt.num_output_frames
+        F_all, F_in, F_out = len(frame_idxs), self.num_input_frames, self.opt.num_output_frames
 
         if not self.training:
-            min_gap = max_gap = self.max_bounded_gap
+            min_gap = max_gap = self.real_max_bounded_gap
         else:
-            min_gap, max_gap = self.min_bounded_gap, self.max_bounded_gap
+            min_gap, max_gap = self.real_min_bounded_gap, self.real_max_bounded_gap
 
         # Pick a video clip
         if F_all >= max_gap:
@@ -161,10 +172,21 @@ class BaseDataset(EasyDataset):
         H, W = images.shape[-2:]
         new_H, new_W = self.opt.input_res
 
+        if self.aspect_ratio <= 1.:
+            new_W = int(max(new_H, new_W))
+            new_H = int(self.aspect_ratio * new_W)
+        else:
+            new_H = int(max(new_H, new_W))
+            new_W = int(round(new_H / self.aspect_ratio))
+        new_H = new_H // self.opt.size_divisor * self.opt.size_divisor
+        new_W = new_W // self.opt.size_divisor * self.opt.size_divisor
+
         # Resize and CenterCrop images
-        scale_factor = max(new_H / H, new_W / W)
-        if self.training and scale_factor <= 1.:
-            scale_factor = np.random.uniform(scale_factor, 1.)
+        assert self.opt.crop_resize_ratio[0] <= self.opt.crop_resize_ratio[1]
+        scale_factor_max = max(new_H / (self.opt.crop_resize_ratio[0] * H), new_W / (self.opt.crop_resize_ratio[0] * W))  # to keep cropped images are not too small
+        scale_factor = max(new_H / (self.opt.crop_resize_ratio[1] * H), new_W / (self.opt.crop_resize_ratio[1] * W))
+        if self.training and scale_factor_max <= 1. and scale_factor <= 1.:
+            scale_factor = np.random.uniform(scale_factor, scale_factor_max)
         scaled_H, scaled_W = round(H * scale_factor), round(W * scale_factor)
         # Assume we don't have to worry about changing the intrinsics based on how the images are rounded
         images = tvT.Resize((scaled_H, scaled_W), tvT.InterpolationMode.BICUBIC)(images)  # intrinsic not changed

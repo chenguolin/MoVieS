@@ -16,6 +16,6 @@ diffusers
 omegaconf
 h5py
 decord
-deepspeed==0.17.1
+deepspeed
 flow_vis
 kiui

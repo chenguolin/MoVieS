@@ -14,7 +14,10 @@ lr_scheduler:
 
 train:
   batch_size_per_gpu: 8
-  epochs: 30
+  gradient_accumulation_steps: 1
+  use_deepspeed: false
+  zero_stage: 2
+  epochs: 10
   log_freq: 1
   early_eval_freq: 100
   early_eval: 1000

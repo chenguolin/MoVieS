@@ -149,7 +149,7 @@ class Visualizer:
             video_writer = imageio.get_writer(save_path, fps=self.fps, macro_block_size=1)
 
             # Write frames to the video file
-            for frame in wide_list[2:-1]:
+            for frame in wide_list:
                 video_writer.append_data(frame)
 
             video_writer.close()

@@ -45,7 +45,7 @@ def colorize_flow(flows: Tensor, batch_mode: bool = False):
     return flow_to_image(flows)
 
 
-def save_xyz_rgb_as_ply(filename: str, xyz: Tensor, rgb: Optional[Tensor] = None):
+def save_xyz_rgb_as_ply(filename: str, xyz: Tensor, rgb: Optional[Tensor] = None, ratio: float = 1.):
     """Save an (F, 3, H, W) or (N, 3) XYZ tensor and corresponding RGB tensor as a PLY point cloud file."""
     if rgb is None:
         rgb = torch.ones_like(xyz)
@@ -56,6 +56,10 @@ def save_xyz_rgb_as_ply(filename: str, xyz: Tensor, rgb: Optional[Tensor] = None
         assert xyz.shape[1] == 3
         xyz = rearrange(xyz, "f c h w -> (f h w) c")
         rgb = rearrange(rgb, "f c h w -> (f h w) c")
+
+    if ratio < 1.:
+        idxs = torch.randperm(xyz.shape[0])[:int(xyz.shape[0] * ratio)]
+        xyz, rgb = xyz[idxs], rgb[idxs]
 
     assert xyz.ndim == 2 and xyz.shape[-1] == 3
     xyz = xyz.cpu().numpy()
