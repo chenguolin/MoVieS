@@ -44,12 +44,13 @@ You may also be interested in our other works:
 - [x] Provide source codes for inference and training.
 - [x] Provide the pretrained checkpoint.
 - [ ] Provide detailed instructions for inference and training.
+- [ ] Make the codebase cleaner.
 
 
 ## 🔧 Installation
 
 You may need to modify the specific version of `torch` in `settings/setup.sh` according to your CUDA version.
-There are not restrictions on the `torch` version, feel free to use your preferred one.
+There are no restrictions on the `torch` version, feel free to use your preferred one.
 ```bash
 conda create -n movies python=3.10 -y
 conda activate movies
@@ -70,7 +71,7 @@ mkdir -p resources && cd resources
 hf download chenguolin/MoVieS movies_ckpt.safetensors DAVIS/ --local-dir resources
 ```
 
-2. Run the inference script for novel view synthesis. In the inference script, we first render the dynamic scene with a fixed camera, and then fix the timestamp and render the scene with a moving camera to synthesis novel views. You can also apply other desired combinations of camera poses and timestamps for novel view rendering.
+2. Run the inference script for novel view synthesis. In the inference script, we first render the dynamic scene with a fixed camera, and then fix the timestamp and render the scene with a moving camera to synthesize novel views. You can also apply other desired combinations of camera poses and timestamps for novel view rendering.
 ```bash
 # python src/infer_davis_nvs.py --name <DAVIS_SAMPLE_NAME>
 # For example:
@@ -102,7 +103,7 @@ Inference results will be saved in `out/<DAVIS_SAMPLE_NAME>`. You will get:
 
 - We use three static scene datasets ([RealEstate10K](https://google.github.io/realestate10k), [TartanAir](https://theairlab.org/tartanair-dataset) and [MatrixCity](https://city-super.github.io/matrixcity)) and five dynamic scene datasets ([PointOdyssey](https://pointodyssey.com), [DynamicReplica](https://dynamic-stereo.github.io), [Spring](https://spring-benchmark.org), [VKITTI2](https://europe.naverlabs.com/proxy-virtual-worlds-vkitti-2) and [Stereo4D](https://stereo4d.github.io)) to train MoVieS.
 - Support combining multiple datasets for training via `src/data/easy_dataset.py`.
-- Support dynamic number of input frames and aspect ratios via `src/data/dynamic_dataloader.py`.
+- Support dynamic numbers of input frames and aspect ratios via `src/data/dynamic_dataloader.py`.
 - Set your dataset directory in `src/options.py` before training.
 
 ### 🧑‍🏫 Training Instructions
@@ -119,7 +120,7 @@ If you find our work helpful, please consider citing:
 ```bibtex
 @inproceedings{lin2026movies,
   title={MoVieS: Motion-Aware 4D Dynamic View Synthesis in One Second},
-  author={Lin, Chenguo and Lin, Yuchen and Pan, Panwang and Yu, Yifan and and Hu, Tao and Yan, Honglei and Fragkiadaki, Katerina and Mu, Yadong},
+  author={Lin, Chenguo and Lin, Yuchen and Pan, Panwang and Yu, Yifan and Hu, Tao and Yan, Honglei and Fragkiadaki, Katerina and Mu, Yadong},
   booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR)},
   year={2026}
 }
