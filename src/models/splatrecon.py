@@ -19,7 +19,7 @@ from src.utils import convert_to_buffer, colorize_depth, normalize_among_last_di
 
 class SplatRecon(nn.Module):
     """A wrapper model for 3DGS feed-forward reconstruction."""
-    def __init__(self, opt: Options, step_tracker: Optional[StepTracker] = None):
+    def __init__(self, opt: Options, step_tracker: Optional[StepTracker] = None, load_lpips: bool = True):
         super().__init__()
 
         self.opt = opt
@@ -33,8 +33,11 @@ class SplatRecon(nn.Module):
 
         # Pretrained models as module buffers
             ## LPIPS loss
-        self.lpips_loss = LPIPS(net="vgg")
-        convert_to_buffer(self.lpips_loss, persistent=False)  # no gradient & not save to checkpoint
+        if load_lpips:
+            self.lpips_loss = LPIPS(net="vgg")
+            convert_to_buffer(self.lpips_loss, persistent=False)  # no gradient & not save to checkpoint
+        else:
+            self.lpips_loss = None
             ## Depth and motion loss
         self.depth_loss, self.motion_loss = DepthLoss(self.opt), MotionLoss(self.opt)
         convert_to_buffer(self.depth_loss, persistent=False)
