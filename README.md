@@ -64,7 +64,7 @@ bash settings/setup.sh
 ### 📸 Novel View Synthesis
 
 #### In-the-wild DAVIS dataset
-1. Download the pretrained checkpoint and preprocessed posed videos from [🤗HuggingFace](https://huggingface.co/chenguolin/MoVieS) and put it in `resources/`. In-the-wild videos are provided by the [DAVIS dataset](https://davischallenge.org/davis2016/code.html), and their camera poses are estimated by [MegaSAM](https://github.com/mega-sam/mega-sam).
+1. Download the pretrained checkpoint and preprocessed videos with poses from [🤗HuggingFace](https://huggingface.co/chenguolin/MoVieS) and put them in `resources/`. In-the-wild videos are provided by the [DAVIS dataset](https://davischallenge.org/davis2016/code.html), and their camera poses are estimated by [MegaSAM](https://github.com/mega-sam/mega-sam).
 ```bash
 mkdir -p resources && cd resources
 hf download chenguolin/MoVieS movies_ckpt.safetensors DAVIS/ --local-dir resources
@@ -79,7 +79,7 @@ python src/infer_davis_nvs.py --name motocross-bumps
 Inference results will be saved in `out/<DAVIS_SAMPLE_NAME>`. You will get:
 | **Input Video** (`input_video.mp4`) | **Predicted Motion** (`output_motion_camera0.mp4`) | **Novel View Synthesis** (`output_render.mp4`) |
 |:-:|:-:|:-:|
-| ![input](./assets/davis_nvs/input.gif) | ![motion](./assets/davis_nvs/motion.gif) | ![nvs](./assets/davis_nvs/render.gif) |
+| <img src="./assets/davis_nvs/input.gif" width="240"> | <img src="./assets/davis_nvs/motion.gif" width="240"> | <img src="./assets/davis_nvs/render.gif" width="240"> |
 
 ### 📍 3D Point Tracking
 
