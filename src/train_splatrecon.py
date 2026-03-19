@@ -715,7 +715,7 @@ def main():
                     with torch.no_grad():
                         model.eval()
 
-                        all_val_matrics, val_steps = {}, 0
+                        all_val_metrics, val_steps = {}, 0
                         val_progress_bar = tqdm(
                             range(len(val_loader)) if args.max_val_steps is None \
                                 else range(args.max_val_steps),
@@ -775,40 +775,40 @@ def main():
                             val_progress_bar.update(1)
                             val_steps += 1
 
-                            all_val_matrics.setdefault("psnr", []).append(val_psnr)
-                            all_val_matrics.setdefault("ssim", []).append(val_ssim)
-                            all_val_matrics.setdefault("lpips", []).append(val_lpips)
-                            all_val_matrics.setdefault("loss", []).append(val_loss)
+                            all_val_metrics.setdefault("psnr", []).append(val_psnr)
+                            all_val_metrics.setdefault("ssim", []).append(val_ssim)
+                            all_val_metrics.setdefault("lpips", []).append(val_lpips)
+                            all_val_metrics.setdefault("loss", []).append(val_loss)
 
                             if val_depth_loss is not None:
-                                all_val_matrics.setdefault("depth_loss", []).append(val_depth_loss)
+                                all_val_metrics.setdefault("depth_loss", []).append(val_depth_loss)
                             if val_depth_render_loss is not None:
-                                all_val_matrics.setdefault("depth_render_loss", []).append(val_depth_render_loss)
+                                all_val_metrics.setdefault("depth_render_loss", []).append(val_depth_render_loss)
                             if val_opacity_loss is not None:
-                                all_val_matrics.setdefault("opacity_loss", []).append(val_opacity_loss)
+                                all_val_metrics.setdefault("opacity_loss", []).append(val_opacity_loss)
                             if val_motion_loss is not None:
-                                all_val_matrics.setdefault("motion_loss", []).append(val_motion_loss)
+                                all_val_metrics.setdefault("motion_loss", []).append(val_motion_loss)
                             if val_motion_reg is not None:
-                                all_val_matrics.setdefault("motion_reg", []).append(val_motion_reg)
+                                all_val_metrics.setdefault("motion_reg", []).append(val_motion_reg)
                             if val_gaussian_usage is not None:
-                                all_val_matrics.setdefault("gaussian_usage", []).append(val_gaussian_usage)
+                                all_val_metrics.setdefault("gaussian_usage", []).append(val_gaussian_usage)
                             if val_voxel_ratio is not None:
-                                all_val_matrics.setdefault("voxel_ratio", []).append(val_voxel_ratio)
+                                all_val_metrics.setdefault("voxel_ratio", []).append(val_voxel_ratio)
 
                             if args.max_val_steps is not None and val_steps == args.max_val_steps:
                                 break
 
                     val_progress_bar.close()
 
-                    for k, v in all_val_matrics.items():
-                        all_val_matrics[k] = torch.tensor(v).mean()
+                    for k, v in all_val_metrics.items():
+                        all_val_metrics[k] = torch.tensor(v).mean()
 
                     logger.info(
                         f"Eval [{global_update_step:06d} / {total_updated_steps:06d}] " +
-                        f"psnr: {all_val_matrics['psnr'].item():.4f}, " +
-                        f"ssim: {all_val_matrics['ssim'].item():.4f}, " +
-                        f"lpips: {all_val_matrics['lpips'].item():.4f}, " +
-                        f"loss: {all_val_matrics['loss'].item():.4f}\n"
+                        f"psnr: {all_val_metrics['psnr'].item():.4f}, " +
+                        f"ssim: {all_val_metrics['ssim'].item():.4f}, " +
+                        f"lpips: {all_val_metrics['lpips'].item():.4f}, " +
+                        f"loss: {all_val_metrics['loss'].item():.4f}\n"
                     )
 
                     outputs = accelerator.gather(outputs)
@@ -816,13 +816,13 @@ def main():
 
                     if accelerator.is_main_process:
                         wandb.log({
-                            "validation/psnr": all_val_matrics["psnr"].item(),
-                            "validation/ssim": all_val_matrics["ssim"].item(),
-                            "validation/lpips": all_val_matrics["lpips"].item(),
-                            "validation/loss": all_val_matrics["loss"].item()
+                            "validation/psnr": all_val_metrics["psnr"].item(),
+                            "validation/ssim": all_val_metrics["ssim"].item(),
+                            "validation/lpips": all_val_metrics["lpips"].item(),
+                            "validation/loss": all_val_metrics["loss"].item()
                         }, step=global_update_step)
 
-                        for name, val in all_val_matrics.items():
+                        for name, val in all_val_metrics.items():
                             if name not in {"psnr", "ssim", "lpips", "loss"}:
                                 wandb.log({
                                     f"validation/{name}": val.item()
